@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/dawait
+dawait.so
+dawait.dylib
+dawait.dll
+dawait.a
+dawait.lib
+dawait-test-*
+*.exe
+*.o
+*.obj
+*.lst
