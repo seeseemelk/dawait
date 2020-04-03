@@ -1,28 +1,11 @@
 module dawait;
 
-import std.parallelism; // : async_task = task;
+import std.parallelism;
 import std.container;
-import std.stdio;
 import core.thread.fiber;
 import core.sync.semaphore;
 
 version(unittest) import fluent.asserts;
-
-/*struct Counter
-{
-shared @nogc @pure nothrow @safe:
-	private int count = 0;
-
-	synchronized void increase()
-	{
-		count++;
-	}
-
-	synchronized void decrease()
-	{
-		count--;
-	}
-}*/
 
 private SList!Fiber fibersQueued = SList!Fiber();
 private size_t globalWaitingOnThreads = 0;
@@ -36,9 +19,9 @@ from the current fiber.
 Params:
 	task = The task to run.
 */
-void async(T)(lazy T task)
+void async(void delegate() task)
 {
-	auto fiber = new Fiber({task;});
+	auto fiber = new Fiber(task);
 	fibersQueued.insert(fiber);
 }
 
@@ -47,7 +30,7 @@ unittest
 {
 	scope(exit) fibersQueued = SList!Fiber();
 	fibersQueued.empty.should.equal(true).because("there should be no queued tasks at first");
-	async(true);
+	async({});
 	fibersQueued.empty.should.equal(false).because("there should be a single task");
 }
 
@@ -57,7 +40,7 @@ unittest
 	scope(exit) fibersQueued = SList!Fiber();
 	bool executed = false;
 	auto executeIt = {executed = true;};
-	async(executeIt());
+	async(executeIt);
 	executed.should.equal(false).because("async should not execute its operand");
 }
 
@@ -146,7 +129,7 @@ Starts the scheduler.
 void startScheduler(void delegate() firstTask)
 {
 	globalSync = new Semaphore;
-	async(firstTask());
+	async({firstTask();});
 
 	while (!fibersQueued.empty)
 	{
@@ -180,7 +163,7 @@ unittest
 {
 	scope(exit) fibersQueued = SList!Fiber();
 	bool executed = false;
-	async(executed = true);
+	async({executed = true;});
 	startScheduler({});
 	executed.should.equal(true).because("startScheduler should execute the task executed before itself");
 }
@@ -192,7 +175,7 @@ unittest
 	bool executed = false;
 	startScheduler(
 	{
-		async(executed = true);
+		async({executed = true;});
 	});
 	executed.should.equal(true).because("startScheduler should execute the task created during the initial task");
 }
