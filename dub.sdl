@@ -3,5 +3,8 @@ description "A simple to use async/await library"
 authors "Sebastiaan de Schaetzen"
 copyright "Copyright © 2020, Sebastiaan de Schaetzen"
 license "Boost"
-dependency "fluent-asserts" version="~>0.13.3"
-dependency "silly" version="~>1.0.2"
+
+buildType "unittest" {
+	dependency "fluent-asserts" version="~>0.13.3"
+	dependency "silly" version="~>1.0.2"
+}
