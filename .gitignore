@@ -13,3 +13,4 @@ dawait-test-*
 *.o
 *.obj
 *.lst
+*.a
